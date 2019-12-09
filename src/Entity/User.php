@@ -15,7 +15,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ApiResource
+ * @ApiResource(
+ *  normalizationContext={"groups"="users_read"}
+ * )
  * @UniqueEntity("email",message="un utilisateur ayant cette adresse existe déjà")
  */
 class User implements UserInterface
@@ -24,13 +26,13 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"customers_read", "invoices_read","invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read","invoices_subresource","users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"customers_read", "invoices_read","invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read","invoices_subresource","users_read"})
      * @Assert\NotBlank(message="non vide")
      * @Assert\Email(message="pas format d'email")
      */
@@ -52,7 +54,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read","invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read","invoices_subresource","users_read"})
      * @Assert\NotBlank(message="non vide")
      * @Assert\Length(min=3, minMessage="entre 3 et 255 caractères", max=255, maxMessage="entre 3 et 255 caractères")
 
@@ -61,7 +63,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"customers_read", "invoices_read","invoices_subresource"})
+     * @Groups({"customers_read", "invoices_read","invoices_subresource","users_read"})
      * @Assert\NotBlank(message="non vide")
      * @Assert\Length(min=3, minMessage="entre 3 et 255 caractères", max=255, maxMessage="entre 3 et 255 caractères")
 
