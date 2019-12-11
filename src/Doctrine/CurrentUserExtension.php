@@ -9,14 +9,14 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use App\Entity\Invoice;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface{
 
     private $security;
     private $auth;
 
-    public function __construct(Security $security, AuthorizationChecker $checked){
+    public function __construct(Security $security, AuthorizationCheckerInterface $checked){
         $this->security = $security;
         $this->auth=$checked;
     }
