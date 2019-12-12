@@ -1,26 +1,47 @@
-import React from "react";
+import React, {useState} from "react";
 import ReactDOM from "react-dom";
 import NavBar from "./components/NavBar";
 import HomePage from "./pages/HomePage";
-import { HashRouter, Switch, Route } from "react-router-dom";
-import CustomerPage from "./pages/CustomerPage";
+import { HashRouter, Switch, Route, withRouter } from "react-router-dom";
+import CustomersPage from "./pages/CustomerPage";
 import InvoicesPage from "./pages/InvoicesPage";
+import LoginPage from "./pages/LoginPage";
+import authAPI from './services/authAPI'
+import AuthContext from './contexts/AuthContext'
+import PrivateRoute from './components/PrivateRoute'
 
 require("../css/app.css");
 
-const App = () => {
-  return (
-    <HashRouter>
-      <NavBar />
-      <main e="container pt-5">
-        <Switch>
-        <Route path="/invoices" component={InvoicesPage} />
+authAPI.setup();
 
-          <Route path="/customers" component={CustomerPage} />
-          <Route path="/" component={HomePage} />
-        </Switch>
-      </main>
-    </HashRouter>
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    authAPI.isAuthenticated()
+  );
+  const NavBarWithRouter = withRouter(NavBar);
+
+  return (
+    <AuthContext.Provider value={isAuthenticated, setIsAuthenticated}>
+      <HashRouter>
+        <NavBarWithRouter />
+        <main e="container pt-5">
+          <Switch>
+            <Route path="/login" component ={LoginPage}/>
+
+            <PrivateRoute
+              path="/invoices"
+              component={InvoicesPage}
+            />
+            <PrivateRoute
+              path="/customers"
+              component={CustomersPage}
+            />
+
+            <Route path="/" component={HomePage} />
+          </Switch>
+        </main>
+      </HashRouter>
+    </AuthContext.Provider>
   );
 };
 

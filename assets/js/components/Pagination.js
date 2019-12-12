@@ -11,10 +11,6 @@ const Pagination = ({ currentPage, itemsPerPage, length, onPageChanged }) => {
   for (let i = 1; i < pagesCount; i++) {
     pages.push(i);
   }
-  pages.push(1);
-  pages.push(2);
-  pages.push(3);
-  pages.push(4);
 
   return (
     <div>

@@ -114,10 +114,10 @@ const InvoicesPage = props => {
                 </span>
               </td>
               <td className="text-center">
-                {invoice.amount.toLocalString()} €
+                {invoice.amount.toLocaleString()} €
               </td>
               <td>
-                <button btn btn-sm btn-primary>Editer</button>&nbsp;
+                <button className="btn btn-sm btn-primary">Editer</button>&nbsp;
                 <button
                   onClick={() => handleDelete(invoice.id)}
                   className="btn btn-sm btn-danger"

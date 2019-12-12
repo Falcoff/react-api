@@ -26,7 +26,7 @@ const CustomerPage = props => {
     setCustomers(customers.filter(customer => customer.id !== id));
 
     try{
-        await CustomersApi.delete(id);
+        await CustomerApi.delete(id);
     } catch(error){
         setCustomers(originalCustomers);
         console.log(error.response);
@@ -95,7 +95,7 @@ const CustomerPage = props => {
                 </span>
               </td>
               <td className="text-center">
-                {customer.totalAmount.toLocalString()} €
+                {customer.totalAmount.toLocaleString()} €
               </td>
               <td>
                 <button
