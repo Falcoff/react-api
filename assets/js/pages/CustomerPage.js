@@ -1,124 +1,95 @@
-import React, { useEffect, useState } from "react";
-import Pagination from "../components/Pagination";
+import React, {useState, useEffect} from "react";
+import Field from "../components/forms/Field";
+import {Link} from "react-router-dom"
 import CustomerApi from "../services/customerAPI"
+import { X_OK } from "constants";
 
-const CustomerPage = props => {
-  const [customers, setCustomers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [search, setSearch] = useState("");
+const CustomerPage = ({match, history}) => {
 
+    const {id = "new"} = match.params
 
-  const fetchCustomers = async () => {
-    try {
-        const data = await CustomerApi.findAll()
-        setCustomers(data)
-    } catch (error){
-      console.log(error.response)
+    const [customer,setCustomer,] = useState({
+        lastName: "",
+        firstName:"",
+        email:"",
+        company:""
+    })
+
+    const [errors, setErrors] = useState({
+        lastName: "",
+        firstName: "",
+        email: "",
+    })
+
+    const [editing,setEditing] = useState(false)
+
+    const fetchCustomer = async id => {
+        try{
+            console.log(id)
+            const {firstName, lastName, email, company} =  await CustomerApi.find(id)
+            setCustomer ({firstName, lastName, email, company})
+        }catch(error){
+            console.log(error)
+            console.log(error.response)
+            console.log(history)
+            history.replace("/customers")
+        }
     }
-  }
-  useEffect(() => {
-    fetchCustomers()
-      
-  }, []);
 
-  const handleDelete = async id => {
-    const originalCustomers = [...customers];
-    setCustomers(customers.filter(customer => customer.id !== id));
+    useEffect(() => {
+        if(id!=="new"){
+            setEditing(true)
+            fetchCustomer(id)
+        }
+    },[id])
 
-    try{
-        await CustomerApi.delete(id);
-    } catch(error){
-        setCustomers(originalCustomers);
-        console.log(error.response);
+
+    const handleChange=({currentTarget}) => {
+        const {name, value} = currentTarget
+        setCustomer({...customer, [name]: value})
     }
-  };
 
-  const handleSearch = event => {
-    const value = event.currentTarget.value;
-    setSearch(value);
-    setCurrentPage(1);
-  };
+    const handleSubmit = async (event) => {
+        event.preventDefault()
+        try{
+            if(editing){
+                const response = await CustomerApi.update(id, customer)
+                console.log(response)
+            }else{
+                const response = await CustomerApi.createCustomer(customer)
+                history.replace("/customers")
+            }
 
-  const itemsPerPage = 10;
+            setErrors({})
 
-  const filteredCustomers = customers.filter(
-    c =>
-      c.firstName.toLowerCase().includes(search.toLowerCase()) ||
-      c.lastName.toLowerCase().includes(search.toLowerCase()) ||
-      c.email.toLowerCase().includes(search.toLowerCase())
-  );
-  const paginatedCustomers = Pagination.getData(
-    filteredCustomers,
-    currentPage,
-    itemsPerPage
-  );
+        } catch({response}){
+            console.log(response)
+            const {violations} = response.data
 
-  const handleChangePage = page => {
-    setCurrentPage(page);
-  };
+            if(violations){
+                const apiErrors= {}
+                violations.forEach(violation =>{
+                    apiErrors[violation.propertyPath] = violation.message
+                })
+                setErrors(apiErrors)
+
+            }
+        }
+    }
 
   return (
     <>
-      <h1>List des clients</h1>
-      <div className="form-group">
-        <input
-          className="form-control"
-          onChange={handleSearch}
-          value={search}
-          placeholder="Rechercher ..."
-        ></input>
-      </div>
-      <table className="table table-hover">
-        <thead>
-          <tr>
-            <th>Id.</th>
-            <th>Client</th>
-            <th>Mail</th>
-            <th>Entreprise</th>
-            <th>Factures</th>
-            <th>Montant total</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedCustomers.map(customer => (
-            <tr key={customer.id}>
-              <td>{customer.id}</td>
-              <td>
-                {customer.firstName} {customer.lastName}
-              </td>
-              <td>{customer.email}</td>
-              <td>{customer.company}</td>
-              <td className="text-center">
-                <span className="badge badge-light">
-                  {customer.invoices.length}
-                </span>
-              </td>
-              <td className="text-center">
-                {customer.totalAmount.toLocaleString()} €
-              </td>
-              <td>
-                <button
-                  onClick={() => handleDelete(customer.id)}
-                  disabled={customer.invoices.length > 0}
-                  className="btn btn-sm btn-danger"
-                >
-                  Supprimer
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {itemsPerPage < filteredCustomers.length && (
-        <Pagination
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          length={filteredCustomers.length}
-          onPageChanged={handleChangePage}
-        />
-      )}
+{!editing &&<h1>Création d'un client</h1> || <h1>Modification du client</h1>}
+      <form onSubmit={handleSubmit}>
+        <Field name="lastName" label="Nom de famille" onChange={handleChange} placeholder="Nom de famille du client" value={customer.lastName} error={errors.lastName}/>
+        <Field name="firstName" label="Prénom"  onChange={handleChange} placeholder="Prénom du client" value={customer.firstName} error={errors.firstName}/>
+        <Field name="email" label="Email" onChange={handleChange} placeholder="Email du client" value={customer.email} type="email" error={errors.email}/>
+        <Field name="company" label="Entreprise" onChange={handleChange} placeholder="Entreprise du client" value={customer.company} error={errors.company}/>
+        <div className='form-group'>
+            <button className="btn btn-success" type="submit">Enregistrer</button>
+            <Link to="/customers" className="btn btn-link">Retour</Link>
+        </div>
+      </form>
     </>
   );
 };
