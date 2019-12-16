@@ -35,8 +35,6 @@ const RegisterPage = ({ history }) => {
               return ;
           }
 
-
-
           try{
             const response = await userApi.register
             setErrors({})

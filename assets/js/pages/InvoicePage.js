@@ -3,8 +3,9 @@ import Field from '../components/forms/Field';
 import Select from "../components/forms/Select"
 import {Link} from "react-router-dom"
 import CustomerApi from "../services/customerAPI"
-import axios from 'axios'
 import invoicesAPI from '../services/invoicesAPI';
+import FormContentLoader from '../components/loaders/FormContentLoader';
+
 
 const InvoicePage = ({history, match}) => {
 
@@ -25,6 +26,7 @@ const InvoicePage = ({history, match}) => {
     customer: "",
     status: ""
   });
+  const [loading, setLoading] = useState(true)
 
   const handleChange = ({ currentTarget }) => {
     const { name, value } = currentTarget;
@@ -36,6 +38,7 @@ const InvoicePage = ({history, match}) => {
         const data = await invoicesAPI.find(id)
         const {amount, status, customer} = data
         setInvoice({amount, status, customer : customer.id})
+        setLoading(false)
       }catch({response}) {
         console.log(response)
       }
@@ -56,6 +59,7 @@ const InvoicePage = ({history, match}) => {
       try{
         const data = await CustomerApi.findAll()
         setCustomers(data)
+        setLoading(false)
         if(!invoice.customer) setInvoice({...invoice, customer: data[0].id})
       } catch(error){
         console.log(error.response)
@@ -101,7 +105,8 @@ const InvoicePage = ({history, match}) => {
   return (
     <>
       {!editing && <h1>Creation d'une facture</h1> ||<h1>Modification d'une facture</h1>}
-      <form onSubmit={handleSubmit}>
+      {loading &&<FormContentLoader/>}
+      {!loading &&<form onSubmit={handleSubmit}>
         <Field
           name="amount"
           type="number"
@@ -123,7 +128,7 @@ const InvoicePage = ({history, match}) => {
             <button className="btn btn-success" type="submit">Enregistrer</button>
             <Link to="/invoices" className="btn btn-link">Retour aux factures</Link>
         </div>
-      </form>
+      </form>}
     </>
   );
 };

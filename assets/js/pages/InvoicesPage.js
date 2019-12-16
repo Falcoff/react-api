@@ -3,6 +3,7 @@ import Pagination from "../components/Pagination";
 import InvoicesApi from "../services/invoicesAPI"
 import moment from 'moment'
 import {Link } from 'react-router-dom'
+import TableLoader from "../components/loaders/TableLoader";
 
 
 const STATUS_CLASSES = {
@@ -22,12 +23,14 @@ const InvoicesPage = props => {
   const [invoices, setInvoices] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
+  const [loading, setLoading]= useState(true)
 
 
   const fetchInvoices = async () => {
     try {
         const data = await InvoicesApi.getInvoices()
         setInvoices(data)
+        setLoading(false);
     } catch (error){
       console.log(error.response)
     }
@@ -106,9 +109,8 @@ const InvoicesPage = props => {
             <tr key={invoice.id}>
               <td>{invoice.chrono}</td>
               <td>
-                  <a href="#">
-                    {invoice.customer.firstName} {invoice.customer.lastName}
-                  </a>
+              <Link to={"/customers/"+invoice.customer.id}>
+              {invoice.customer.firstName} {invoice.customer.lastName}                </Link>
               </td>
               <td className="text-center">{formatDate(invoice.sentAt)}</td>
               <td className="text-center">
@@ -132,6 +134,8 @@ const InvoicesPage = props => {
           ))}
         </tbody>
       </table>
+      { loading && <TableLoader/>}
+
 
 
         <Pagination
