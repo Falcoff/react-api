@@ -1,28 +1,29 @@
 import axios from "axios"
+import { INVOICES_API, API_URL } from "./config"
 
 function getInvoices() {
     return axios
-    .get("http://localhost:8000/api/invoices")
+    .get(INVOICES_API)
     .then(response => response.data["hydra:member"])
 }
 
 function deleteInvoices(id) {
     return axios
-    .delete("http://localhost:8000/api/invoices/" + id)
+    .delete(INVOICES_API + "/" + id)
 }
 
 function find(id){
     return axios
-    .get("http://localhost:8000/api/invoices/" + id).then(response => response.data)
+    .get(INVOICES_API + "/" + id).then(response => response.data)
 }
 
 function update(id, invoice){
-    return axios.put("http://localhost:8000/api/invoices/" + id, 
+    return axios.put(INVOICES_API + "/" + id, 
         {...invoice, customer :`/api/customers/${invoice.customer}`})
 }
 
 function create(invoice){
-    return axios.post("http://localhost:8000/api/invoices", {...invoice, customer :`/api/customers/${invoice.customer}`})
+    return axios.post(INVOICES_API, {...invoice, customer :`/api/customers/${invoice.customer}`})
 }
 
 export default {

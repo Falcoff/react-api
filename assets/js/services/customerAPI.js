@@ -1,11 +1,12 @@
 import axios from "axios"
 import Cache from "./cache"
+import { CUSTOMERS_API } from "./config"
 
 async function findAll() {
     const cachedCustomers = await Cache.get("customers")
     if(cachedCustomers) return cachedCustomers
         return axios
-        .get("http://localhost:8000/api/customers")
+        .get(CUSTOMERS_API)
         .then(response => {
            const customers = response.data["hydra:member"];
            Cache.set("customers", customers);
@@ -15,7 +16,7 @@ async function findAll() {
 
 function deleteCustomer(id) {
     return axios
-    .delete("http://localhost:8000/api/customers/" + id)
+    .delete(CUSTOMERS_API +"/" + id)
     .then(async response => {
         const cachedCustomers = await Cache.get("customers")
         if(cachedCustomers){
@@ -26,13 +27,13 @@ function deleteCustomer(id) {
 }
 
 function find(id) {
-     return axios.get("http://localhost:8000/api/customers/" + id)
+     return axios.get(CUSTOMERS_API+"/" + id)
      .then(response => response.data);
 }
 
 function update(id, customer){
     return axios
-    .put("http://localhost:8000/api/customers/"+ id, customer)
+    .put(CUSTOMERS_API+"/"+ id, customer)
    .then(async response => {
        const cachedCustomers = await Cache.get("customers")
        if(cachedCustomers){
@@ -47,7 +48,7 @@ function update(id, customer){
 
 function createCustomer(customer){
    return axios
-   .post("http://localhost:8000/api/customers", customer)
+   .post(CUSTOMERS_API, customer)
    .then(async response => {
        const cachedCustomers = await Cache.get("customers")
        if(cachedCustomers){
