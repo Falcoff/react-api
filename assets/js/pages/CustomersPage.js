@@ -30,6 +30,7 @@ const CustomersPage = props => {
     try {
       await CustomerApi.delete(id);
     } catch (error) {
+      console.log(error)
       setCustomers(originalCustomers);
       console.log(error.response);
     }
